@@ -1,0 +1,24 @@
+Maven:
+  - POM.XML 
+  - .jar/.war
+  - Integration with Jenkins
+  - Docker Image
+
+Nexus:
+  - Integration with Jenkins
+  
+Jenkins:
+  - Install jenkins
+  - Build jobs
+  - Test cases
+  - Deploy jobs
+  - pipelines
+  - manual jenkins files and .cdpipelines
+  - Tasks in pipeline to push new code to prod
+  - Variables in pipeline
+  
+Git:
+  - Web-hooks with Jenkins
+  
+Tomcat/Apache/Jboss/WebLogic
+  
