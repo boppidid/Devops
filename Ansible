@@ -269,3 +269,87 @@ hammer:
 - name: 2nd Task
   ---
   ---
+  
+  remote_user
+  vars_files:
+    /path
+    
+  --extra-vars (from terminal)
+
+================
+Lesson 16: Roles
+================
+
+- yaml/yml
+- Folder structure
+- Main.yml
+
+- Roles are used for organizing and structuring Playbooks
+
+If roles are used then no need for include commands for including respective main.yml
+
+- Playbooks and Roles should be in same folder
+
+Ex:
+
+---
+
+- hosts: all
+  become: yes
+  roles:
+    apache
+    
+ 
+Folder structure
+
+Roles/
+  apache/
+    tasks/
+      main.yml
+    handlers/
+      main.yml
+    templates/
+      file.j2
+    vars/
+      main.yml
+    defaults/
+      main.yml
+    meta/
+      main.yml
+    Library/
+    module_utils/
+    lookup_plugins/
+    
+
+tasks/main.yml
+
+---
+- name: 1st Task
+  module_name:
+  
+handlers/main.yml
+
+---
+- name: 1st Handler
+  module_name:
+  
+  
+=================
+Lesson 17: Galaxy
+=================
+
+- searching
+- installing
+- using
+
+- /etc/ansible/roles
+
+ansible-galaxy search <role-name-or-keyword>
+ansible-galaxy install <role-name>
+
+galaxy.ansible.com
+
+Customize role as needed
+    
+
+
