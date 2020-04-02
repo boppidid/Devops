@@ -1,0 +1,271 @@
+===============
+Lesson 1: Intro
+===============
+
+- Ansible host ---> clients (over SSH or Python)
+- Angentless, only on Host server 
+- Scalable to 'N' clients
+
+=========================
+Lesson 2: Install Ansible
+=========================
+
+Requirements:
+-------------
+
+client: SSH server
+
+Server: SSH, Ansible
+
+- Username
+- Sudo or Root permissions
+- Password less Authentication
+
+(ansible localhost -m ping)
+
+=============================
+Lesson 3: Configuring clients
+=============================
+
+- Generate SSH key-pair on host server and copy public ID to clients for passwordless authentication
+- commands: ssh-keygen, (~/.ssh/id_rsa.pub), ssh-copy-id -i /path/id_rsa.pub username@clientIP
+- verify: On client ~/.ssh/authorized_keys file should have our public key with our user@hostname at end
+
+===================
+Lesson 4: Inventory
+===================
+
+- /etc/ansible/hosts or invoke by using -i <path-to-inv-in-ini-format>
+Ex:
+
+[Web]
+awsweb00[1:4]
+
+[DB]
+awsdb[a:d]
+
+[App]
+app-server ansible_user=username ansible_host=10.1.1.10 ansible_port =2022
+
+[AWS:children]
+Web
+DB
+App
+
+================
+Lesson 5: Ad-hoc
+================
+
+- Run directly without playbook
+- ansible -i inventory-file -m module_name -a action -v
+
+Playbook:
+- ansible-playbook play.yaml -vvv
+
+- Privilege escalation (become: yes or -b)
+- Packages/Services
+- Running commands
+
+=================
+Lesson 6: Modules
+=================
+
+- Command (no shell, executes directly)
+- Shell (Use shell, redirects and pipes)
+- Raw (no python needed)
+
+- File
+- Copy
+
+- apt
+- yum
+- service
+- ping
+
+- debug
+- template
+
+- Setup (for facts in ad-hoc mode)
+
+===================
+Lesson 7: Playbooks
+===================
+
+- YAML
+- TASKS
+
+Ex:
+
+---
+
+- hosts: localhost (or a group from inventory file)
+  connection: local
+  gather_facts: yes
+  become: yes
+  vars:
+   - var1: xyz
+   - var2: abc
+  vars_files:
+   - path
+  tasks:
+   - name: 1st Task
+     module-name: parameters
+   - name: 1st Task
+     module-name: parameters
+     
+==================  
+Lesson 8: Handlers
+==================
+
+- execution order
+- conditional execution
+- error handling
+
++++++++++++++++++++++++
+tasks: 
+ ignore_errors: true
+  notify: task name
+handlers:
+ - name: task name
+   module-name: params
++++++++++++++++++++++++ 
+ 
+- Runs only when there is a change
+- Doesn't run if there is no change
+- Executes only once even when multiple tasks call same handler task
+
+===========================
+Lesson 9: Variables & Facts
+===========================
+
+- setup module (ad-hoc mode run to check facts available)
+- referencing variables - jinja2 in playbooks
+
+- ansible inventory -m setup -a "filter=*family*"
+
+FACTS:
+
+- CPU Type      - IP Add
+- OS Family     - CPU Cores
+- RAM Amount    - etc, etc, etc
+
+================
+Lesson 10: Debug
+================
+
+- Registering variables
+- displaying results
+- JSON
+
+register: variable name
+
+debug: msg = "{{var_name}}"
+  var: var_name
+  verbosity: 3
+  
+=======================
+Lesson 11: Conditionals
+=======================
+
+- when 
+- comparision - (var == "string")
+- result filter - (results|failed)
+
+Task        - Unlike programming if -> then, here Run task -> if condition met
+Condition
+
+add water     add food        add stick
+when: dry     when: hungry    when: weak
+
+when: var == "string"
+when: results|failed
+
+================
+Lesson 12: Loops
+================
+
+yum install {{item}}
+
+with_items:                   (Install packages)
+- item 1 (httpd)
+- item 2 (openssh-server)
+
+with_file:                    (Open files)
+- file 1
+- file 2
+
+with_sequence: start=1 end=10                (loop with numbers)
+
+===================
+Lesson 13: Template
+===================
+
+- Jinja2
+- Variables
+- Comments {# Comment #}
+
+template:
+  src: /path/file.j2
+  dst: /path
+  mode: 0777
+  
+Config file to multiple servers but using only one template with dynamic and static variables & comments
+
+================
+Lesson 14: Vault
+================
+
+- encrypt entire playbook
+- decrypt to edit
+ can decrypt using password in (this password is only for playbook)
+  - text file (or)
+  - type manually (--ask-vault-pass or --vault-password-file)
+  
+vars:
+  - ansible_sudo_pass: Pa$$w0rd
+
+- ansible-vault create play.yaml
+- ansible-vault edit play.yaml
+
+- ansible-playbook play.yaml --ask-vault-pass
+- ansible-playbook play.yaml --vault-password-file
+
+ansible-playbook play.yaml --syntax-check
+
+==================
+Lesson 15: Include
+==================
+
+- Plays
+- Tasks
+
+- Playbooks can have multiple plays
+
+---
+
+- hosts: all
+  ----
+  ----
+  ----
+- hosts: all
+  ----
+  ----
+  ----
+  
+  ---
+  
+  - include: saw
+  - hosts: all
+    tasks:
+      - include: hammer
+      
+hammer:
+
+---
+
+- name: 1st Task
+  ---
+  ---
+- name: 2nd Task
+  ---
+  ---
